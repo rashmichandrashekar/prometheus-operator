@@ -1,9 +1,14 @@
-module github.com/prometheus-operator/prometheus-operator/pkg/client
+// module github.com/prometheus-operator/prometheus-operator/pkg/client
+
+module github.com/rashmichandrashekar/prometheus-operator/pkg/client
 
 go 1.19
 
+replace github.com/rashmichandrashekar/prometheus-operator/pkg/apis/monitoring => ../../../prometheus-operator/pkg/apis/monitoring
+
 require (
-	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.66.0
+	// github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.66.0
+	github.com/rashmichandrashekar/prometheus-operator/pkg/apis/monitoring v0.0.0-00010101000000-000000000000
 	k8s.io/api v0.27.2
 	k8s.io/apiextensions-apiserver v0.27.2
 	k8s.io/apimachinery v0.27.2
