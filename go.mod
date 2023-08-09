@@ -3,13 +3,9 @@ module github.com/rashmichandrashekar/prometheus-operator
 
 go 1.20
 
-// replace github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring => ./pkg/apis/monitoring
+replace github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring => ./pkg/apis/monitoring
 
-// replace github.com/prometheus-operator/prometheus-operator/pkg/client => ./pkg/client
-
-replace github.com/rashmichandrashekar/prometheus-operator/pkg/apis/monitoring => ./pkg/apis/monitoring
-
-replace github.com/rashmichandrashekar/prometheus-operator/pkg/client => ./pkg/client
+replace github.com/prometheus-operator/prometheus-operator/pkg/client => ./pkg/client
 
 require (
 	github.com/alecthomas/kingpin/v2 v2.3.2
@@ -30,10 +26,8 @@ require (
 	github.com/oklog/run v1.1.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus-community/prom-label-proxy v0.6.0
-	// github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.66.0
-	// github.com/prometheus-operator/prometheus-operator/pkg/client v0.66.0
-	github.com/rashmichandrashekar/prometheus-operator/pkg/apis/monitoring v0.0.0-00010101000000-000000000000
-	github.com/rashmichandrashekar/prometheus-operator/pkg/client v0.0.0-00010101000000-000000000000
+	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.66.0
+	github.com/prometheus-operator/prometheus-operator/pkg/client v0.66.0
 	github.com/prometheus/alertmanager v0.25.0
 	github.com/prometheus/client_golang v1.15.1
 	github.com/prometheus/common v0.44.0
