@@ -1,5 +1,4 @@
-// module github.com/prometheus-operator/prometheus-operator
-module github.com/rashmichandrashekar/prometheus-operator
+module github.com/prometheus-operator/prometheus-operator
 
 go 1.20
 
