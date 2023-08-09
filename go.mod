@@ -2,6 +2,10 @@ module github.com/prometheus-operator/prometheus-operator
 
 go 1.20
 
+replace github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring => ./pkg/apis/monitoring
+
+replace github.com/prometheus-operator/prometheus-operator/pkg/client => ./pkg/client
+
 require (
 	github.com/alecthomas/kingpin/v2 v2.3.2
 	github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137
