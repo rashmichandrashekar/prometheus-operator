@@ -2,8 +2,6 @@ module github.com/prometheus-operator/prometheus-operator/pkg/client
 
 go 1.19
 
-replace github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring => ./prometheus-operator/pkg/apis/monitoring
-
 require (
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.66.0
 	k8s.io/api v0.27.2
