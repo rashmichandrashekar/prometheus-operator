@@ -51,6 +51,7 @@ func (f *genericInformer) Lister() cache.GenericLister {
 // ForResource gives generic access to a shared informer of the matching type
 // TODO extend this to unknown resources with a client pool
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
+	fmt.Printf("In generic: %v", v1.SchemeGroupVersion.Group)
 	switch resource {
 	// Group=monitoring.coreos.com, Version=v1
 	case v1.SchemeGroupVersion.WithResource("alertmanagers"):
