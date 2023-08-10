@@ -51,37 +51,37 @@ func (f *genericInformer) Lister() cache.GenericLister {
 // ForResource gives generic access to a shared informer of the matching type
 // TODO extend this to unknown resources with a client pool
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
-	fmt.Printf("In generic: %v", v1.SchemeGroupVersion.Group)
-	switch resource {
-	// Group=monitoring.coreos.com, Version=v1
-	case v1.SchemeGroupVersion.WithResource("alertmanagers"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1().Alertmanagers().Informer()}, nil
-	case v1.SchemeGroupVersion.WithResource("podmonitors"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1().PodMonitors().Informer()}, nil
-	case v1.SchemeGroupVersion.WithResource("probes"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1().Probes().Informer()}, nil
-	case v1.SchemeGroupVersion.WithResource("prometheuses"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1().Prometheuses().Informer()}, nil
-	case v1.SchemeGroupVersion.WithResource("prometheusrules"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1().PrometheusRules().Informer()}, nil
-	case v1.SchemeGroupVersion.WithResource("servicemonitors"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1().ServiceMonitors().Informer()}, nil
-	case v1.SchemeGroupVersion.WithResource("thanosrulers"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1().ThanosRulers().Informer()}, nil
+	// fmt.Printf("In generic: %v", v1.SchemeGroupVersion.Group)
+	// switch resource {
+	// // Group=monitoring.coreos.com, Version=v1
+	// case v1.SchemeGroupVersion.WithResource("alertmanagers"):
+	// 	return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1().Alertmanagers().Informer()}, nil
+	// case v1.SchemeGroupVersion.WithResource("podmonitors"):
+	// 	return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1().PodMonitors().Informer()}, nil
+	// case v1.SchemeGroupVersion.WithResource("probes"):
+	// 	return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1().Probes().Informer()}, nil
+	// case v1.SchemeGroupVersion.WithResource("prometheuses"):
+	// 	return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1().Prometheuses().Informer()}, nil
+	// case v1.SchemeGroupVersion.WithResource("prometheusrules"):
+	// 	return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1().PrometheusRules().Informer()}, nil
+	// case v1.SchemeGroupVersion.WithResource("servicemonitors"):
+	// 	return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1().ServiceMonitors().Informer()}, nil
+	// case v1.SchemeGroupVersion.WithResource("thanosrulers"):
+	// 	return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1().ThanosRulers().Informer()}, nil
 
-		// Group=monitoring.coreos.com, Version=v1alpha1
-	case v1alpha1.SchemeGroupVersion.WithResource("alertmanagerconfigs"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1alpha1().AlertmanagerConfigs().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("prometheusagents"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1alpha1().PrometheusAgents().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("scrapeconfigs"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1alpha1().ScrapeConfigs().Informer()}, nil
+	// 	// Group=monitoring.coreos.com, Version=v1alpha1
+	// case v1alpha1.SchemeGroupVersion.WithResource("alertmanagerconfigs"):
+	// 	return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1alpha1().AlertmanagerConfigs().Informer()}, nil
+	// case v1alpha1.SchemeGroupVersion.WithResource("prometheusagents"):
+	// 	return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1alpha1().PrometheusAgents().Informer()}, nil
+	// case v1alpha1.SchemeGroupVersion.WithResource("scrapeconfigs"):
+	// 	return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1alpha1().ScrapeConfigs().Informer()}, nil
 
-		// Group=monitoring.coreos.com, Version=v1beta1
-	case v1beta1.SchemeGroupVersion.WithResource("alertmanagerconfigs"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1beta1().AlertmanagerConfigs().Informer()}, nil
+	// 	// Group=monitoring.coreos.com, Version=v1beta1
+	// case v1beta1.SchemeGroupVersion.WithResource("alertmanagerconfigs"):
+	// 	return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1beta1().AlertmanagerConfigs().Informer()}, nil
 
-	}
+	// }
 
-	return nil, fmt.Errorf("no informer found for %v", resource)
+	return nil, fmt.Errorf("In generic: %v, no informer found for %v", v1.SchemeGroupVersion.Group, resource)
 }
