@@ -15,5 +15,5 @@
 package monitoring
 
 const (
-	GroupName = "azmonitoring.coreos.com"
+	GroupName = "monitoring.coreos.com"
 )
