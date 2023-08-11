@@ -18,8 +18,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-
-	"github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring"
+	// "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring"
 )
 
 // SchemeGroupVersion is the group version used to register these objects
