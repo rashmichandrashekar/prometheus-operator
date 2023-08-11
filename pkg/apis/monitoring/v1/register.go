@@ -22,7 +22,7 @@ import (
 )
 
 // SchemeGroupVersion is the group version used to register these objects
-var SchemeGroupVersion = schema.GroupVersion{Group: monitoring.GroupName, Version: Version}
+//var SchemeGroupVersion = schema.GroupVersion{Group: monitoring.GroupName, Version: Version}
 
 // var SchemeGroupVersion = schema.GroupVersion{Group: "azmonitoring.coreos.com", Version: Version}
 
@@ -48,7 +48,7 @@ func init() {
 }
 
 // func CustomInit(customGroupName string) {
-// 	SchemeGroupVersion = schema.GroupVersion{Group: customGroupName, Version: Version}
+// 	//SchemeGroupVersion = schema.GroupVersion{Group: customGroupName, Version: Version}
 // 	localSchemeBuilder.Register(addKnownTypes)
 // }
 
@@ -81,7 +81,9 @@ func init() {
 
 // Adds the list of known types to api.Scheme.
 func addKnownTypes(scheme *runtime.Scheme) error {
-	scheme.AddKnownTypes(SchemeGroupVersion,
+	CustomSchemeGroupVersion := schema.GroupVersion{Group: "azmonitoring.coreos.com", Version: Version}
+	// scheme.AddKnownTypes(SchemeGroupVersion,
+	scheme.AddKnownTypes(CustomSchemeGroupVersion,
 		&Prometheus{},
 		&PrometheusList{},
 		&ServiceMonitor{},
@@ -97,6 +99,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&ThanosRuler{},
 		&ThanosRulerList{},
 	)
-	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
+	// metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
+	metav1.AddToGroupVersion(scheme, CustomSchemeGroupVersion)
+
 	return nil
 }
