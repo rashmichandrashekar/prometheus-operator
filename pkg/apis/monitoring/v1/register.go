@@ -15,7 +15,7 @@
 package v1
 
 import (
-	"github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring"
+	// "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -30,7 +30,8 @@ import (
 
 // Resource takes an unqualified resource and returns a Group qualified GroupResource
 func Resource(resource string) schema.GroupResource {
-	return SchemeGroupVersion.WithResource(resource).GroupResource()
+	myvar := schema.GroupVersion{Group: "azmonitoring.coreos.com", Version: Version}
+	return myvar.WithResource(resource).GroupResource()
 }
 
 var (
