@@ -21,6 +21,7 @@ import (
 
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/prometheus-operator/prometheus-operator/pkg/client/versioned/scheme"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	rest "k8s.io/client-go/rest"
 )
 
@@ -113,7 +114,8 @@ func New(c rest.Interface) *MonitoringV1Client {
 }
 
 func setConfigDefaults(config *rest.Config) error {
-	gv := v1.SchemeGroupVersion
+	//gv := v1.SchemeGroupVersion
+	gv := schema.GroupVersion{Group: "azmonitoring.coreos.com", Version: Version}
 	config.GroupVersion = &gv
 	config.APIPath = "/apis"
 	config.NegotiatedSerializer = scheme.Codecs.WithoutConversion()
