@@ -24,6 +24,7 @@ import (
 
 // SchemeGroupVersion is the group version used to register these objects
 var SchemeGroupVersion = schema.GroupVersion{Group: monitoring.GroupName, Version: Version}
+var CustomSchemeGroupVersion = schema.GroupVersion{}
 
 // Resource takes an unqualified resource and returns a Group qualified GroupResource
 func Resource(resource string) schema.GroupResource {
@@ -42,6 +43,33 @@ func init() {
 	// generated functions takes place in the generated files. The separation
 	// makes the code compile even when the generated files are missing.
 	localSchemeBuilder.Register(addKnownTypes)
+}
+
+func SetCustomGroup(customGroupName string) {
+	CustomSchemeGroupVersion = schema.GroupVersion{Group: customGroupName, Version: Version}
+	localSchemeBuilder.Register(addKnownTypesCustom)
+}
+
+// Adds the list of known types to api.Scheme.
+func addKnownTypesCustom(scheme *runtime.Scheme) error {
+	scheme.AddKnownTypes(CustomSchemeGroupVersion,
+		&Prometheus{},
+		&PrometheusList{},
+		&ServiceMonitor{},
+		&ServiceMonitorList{},
+		&PodMonitor{},
+		&PodMonitorList{},
+		&Probe{},
+		&ProbeList{},
+		&Alertmanager{},
+		&AlertmanagerList{},
+		&PrometheusRule{},
+		&PrometheusRuleList{},
+		&ThanosRuler{},
+		&ThanosRulerList{},
+	)
+	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
+	return nil
 }
 
 // Adds the list of known types to api.Scheme.
