@@ -15,16 +15,16 @@
 package v1
 
 import (
+	"github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	// "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring"
 )
 
 // SchemeGroupVersion is the group version used to register these objects
 // var SchemeGroupVersion = schema.GroupVersion{Group: monitoring.GroupName, Version: Version}
 
-var SchemeGroupVersion = schema.GroupVersion{}
+var SchemeGroupVersion = schema.GroupVersion{Group: "azmonitoring.coreos.com", Version: Version}
 
 // var CustomSchemeGroupVersion = schema.GroupVersion{}
 
@@ -44,13 +44,13 @@ func init() {
 	// We only register manually written functions here. The registration of the
 	// generated functions takes place in the generated files. The separation
 	// makes the code compile even when the generated files are missing.
-	//localSchemeBuilder.Register(addKnownTypes)
-}
-
-func CustomInit(customGroupName string) {
-	SchemeGroupVersion = schema.GroupVersion{Group: customGroupName, Version: Version}
 	localSchemeBuilder.Register(addKnownTypes)
 }
+
+// func CustomInit(customGroupName string) {
+// 	SchemeGroupVersion = schema.GroupVersion{Group: customGroupName, Version: Version}
+// 	localSchemeBuilder.Register(addKnownTypes)
+// }
 
 // func SetCustomGroup(customGroupName string) {
 // 	CustomSchemeGroupVersion = schema.GroupVersion{Group: customGroupName, Version: Version}
