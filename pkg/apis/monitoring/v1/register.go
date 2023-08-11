@@ -22,11 +22,11 @@ import (
 )
 
 // SchemeGroupVersion is the group version used to register these objects
-//var SchemeGroupVersion = schema.GroupVersion{Group: monitoring.GroupName, Version: Version}
+var SchemeGroupVersion = schema.GroupVersion{Group: monitoring.GroupName, Version: Version}
 
-// var SchemeGroupVersion = schema.GroupVersion{Group: "azmonitoring.coreos.com", Version: Version}
+//var SchemeGroupVersion = schema.GroupVersion{Group: "azmonitoring.coreos.com", Version: Version}
 
-var SchemeGroupVersion = schema.GroupVersion{}
+//var SchemeGroupVersion = schema.GroupVersion{}
 
 // Resource takes an unqualified resource and returns a Group qualified GroupResource
 func Resource(resource string) schema.GroupResource {
