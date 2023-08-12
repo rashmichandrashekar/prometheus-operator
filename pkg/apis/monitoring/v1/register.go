@@ -25,7 +25,7 @@ import (
 var PackageGroupName = func() string {
 	group := monitoring.GroupName
 	isCustomGroup := os.Getenv("IS_CUSTOM_GROUP")
-	if isCustomGroup == true {
+	if isCustomGroup == "true" {
 		mycustomGroup := os.Getenv("MY_CUSTOM_GROUP")
 		if mycustomGroup != nil && mycustomGroup != "" {
 			group = mycustomGroup
