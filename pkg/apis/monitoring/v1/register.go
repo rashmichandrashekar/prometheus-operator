@@ -21,8 +21,20 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
+var PackageGroupName = func() string {
+	group := monitoring.GroupName
+	isCustomGroup := os.Getenv("IS_CUSTOM_GROUP")
+	if isCustomGroup == true {
+		mycustomGroup := os.Getenv("MY_CUSTOM_GROUP")
+		if mycustomGroup != nil && mycustomGroup != "" {
+			group = mycustomGroup
+		}
+	}
+	return group
+}()
+
 // SchemeGroupVersion is the group version used to register these objects
-var SchemeGroupVersion = schema.GroupVersion{Group: monitoring.GroupName, Version: Version}
+var SchemeGroupVersion = schema.GroupVersion{Group: PackageGroupName, Version: Version}
 
 //var SchemeGroupVersion = schema.GroupVersion{Group: "azmonitoring.coreos.com", Version: Version}
 
@@ -46,7 +58,7 @@ func init() {
 	// We only register manually written functions here. The registration of the
 	// generated functions takes place in the generated files. The separation
 	// makes the code compile even when the generated files are missing.
-	//localSchemeBuilder.Register(addKnownTypes)
+	localSchemeBuilder.Register(addKnownTypes)
 }
 
 func CustomInit(customGroupName string) {
