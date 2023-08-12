@@ -27,7 +27,7 @@ var PackageGroupName = func() string {
 	isCustomGroup := os.Getenv("IS_CUSTOM_GROUP")
 	if isCustomGroup == "true" {
 		mycustomGroup := os.Getenv("MY_CUSTOM_GROUP")
-		if mycustomGroup != nil && mycustomGroup != "" {
+		if mycustomGroup != "" {
 			group = mycustomGroup
 		}
 	}
