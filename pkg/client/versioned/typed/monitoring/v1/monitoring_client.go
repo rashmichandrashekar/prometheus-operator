@@ -19,9 +19,9 @@ package v1
 import (
 	"net/http"
 
-	// v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
+	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/prometheus-operator/prometheus-operator/pkg/client/versioned/scheme"
-	"k8s.io/apimachinery/pkg/runtime/schema"
+	// "k8s.io/apimachinery/pkg/runtime/schema"
 	rest "k8s.io/client-go/rest"
 )
 
