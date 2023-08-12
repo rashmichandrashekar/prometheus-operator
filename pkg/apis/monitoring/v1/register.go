@@ -37,14 +37,8 @@ var PackageGroupName = func() string {
 // SchemeGroupVersion is the group version used to register these objects
 var SchemeGroupVersion = schema.GroupVersion{Group: PackageGroupName, Version: Version}
 
-//var SchemeGroupVersion = schema.GroupVersion{Group: "azmonitoring.coreos.com", Version: Version}
-
-//var SchemeGroupVersion = schema.GroupVersion{}
-
 // Resource takes an unqualified resource and returns a Group qualified GroupResource
 func Resource(resource string) schema.GroupResource {
-	//myvar := schema.GroupVersion{Group: "azmonitoring.coreos.com", Version: Version}
-	//return myvar.WithResource(resource).GroupResource()
 	return SchemeGroupVersion.WithResource(resource).GroupResource()
 }
 
@@ -62,43 +56,9 @@ func init() {
 	localSchemeBuilder.Register(addKnownTypes)
 }
 
-func CustomInit(customGroupName string) {
-	SchemeGroupVersion = schema.GroupVersion{Group: customGroupName, Version: Version}
-	localSchemeBuilder.Register(addKnownTypes)
-}
-
-// func SetCustomGroup(customGroupName string) {
-// 	CustomSchemeGroupVersion = schema.GroupVersion{Group: customGroupName, Version: Version}
-// 	localSchemeBuilder.Register(addKnownTypesCustom)
-// }
-
-// Adds the list of known types to api.Scheme.
-// func addKnownTypesCustom(scheme *runtime.Scheme) error {
-// 	scheme.AddKnownTypes(CustomSchemeGroupVersion,
-// 		&Prometheus{},
-// 		&PrometheusList{},
-// 		&ServiceMonitor{},
-// 		&ServiceMonitorList{},
-// 		&PodMonitor{},
-// 		&PodMonitorList{},
-// 		&Probe{},
-// 		&ProbeList{},
-// 		&Alertmanager{},
-// 		&AlertmanagerList{},
-// 		&PrometheusRule{},
-// 		&PrometheusRuleList{},
-// 		&ThanosRuler{},
-// 		&ThanosRulerList{},
-// 	)
-// 	metav1.AddToGroupVersion(scheme, CustomSchemeGroupVersion)
-// 	return nil
-// }
-
 // Adds the list of known types to api.Scheme.
 func addKnownTypes(scheme *runtime.Scheme) error {
-	// CustomSchemeGroupVersion := schema.GroupVersion{Group: "azmonitoring.coreos.com", Version: Version}
 	scheme.AddKnownTypes(SchemeGroupVersion,
-		// scheme.AddKnownTypes(CustomSchemeGroupVersion,
 		&Prometheus{},
 		&PrometheusList{},
 		&ServiceMonitor{},
@@ -115,7 +75,6 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&ThanosRulerList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
-	// metav1.AddToGroupVersion(scheme, CustomSchemeGroupVersion)
 
 	return nil
 }
