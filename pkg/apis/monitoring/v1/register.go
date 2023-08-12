@@ -46,13 +46,13 @@ func init() {
 	// We only register manually written functions here. The registration of the
 	// generated functions takes place in the generated files. The separation
 	// makes the code compile even when the generated files are missing.
-	localSchemeBuilder.Register(addKnownTypes)
+	//localSchemeBuilder.Register(addKnownTypes)
 }
 
-// func CustomInit(customGroupName string) {
-// 	SchemeGroupVersion = schema.GroupVersion{Group: customGroupName, Version: Version}
-// 	localSchemeBuilder.Register(addKnownTypes)
-// }
+func CustomInit(customGroupName string) {
+	SchemeGroupVersion = schema.GroupVersion{Group: customGroupName, Version: Version}
+	localSchemeBuilder.Register(addKnownTypes)
+}
 
 // func SetCustomGroup(customGroupName string) {
 // 	CustomSchemeGroupVersion = schema.GroupVersion{Group: customGroupName, Version: Version}
