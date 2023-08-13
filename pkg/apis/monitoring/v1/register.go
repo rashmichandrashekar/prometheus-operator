@@ -15,10 +15,12 @@
 package v1
 
 import (
-	"github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+
+	"github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring"
+
 	"os"
 )
 
