@@ -75,6 +75,5 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&ThanosRulerList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
-
 	return nil
 }
