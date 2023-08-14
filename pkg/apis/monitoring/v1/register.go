@@ -24,14 +24,23 @@ import (
 	"os"
 )
 
+// var PackageGroupName = func() string {
+// 	group := monitoring.GroupName
+// 	isCustomGroup := os.Getenv("IS_CUSTOM_GROUP")
+// 	if isCustomGroup == "true" {
+// 		mycustomGroup := os.Getenv("MY_CUSTOM_GROUP")
+// 		if mycustomGroup != "" {
+// 			group = mycustomGroup
+// 		}
+// 	}
+// 	return group
+// }()
+
 var PackageGroupName = func() string {
 	group := monitoring.GroupName
-	isCustomGroup := os.Getenv("IS_CUSTOM_GROUP")
-	if isCustomGroup == "true" {
-		mycustomGroup := os.Getenv("MY_CUSTOM_GROUP")
-		if mycustomGroup != "" {
-			group = mycustomGroup
-		}
+	customGroupV1 := os.Getenv("PROMETHEUS_OPERATOR_V1_CUSTOM_GROUP")
+	if customGroupV1 != "" {
+		group = customGroupV1
 	}
 	return group
 }()
