@@ -827,7 +827,16 @@ func (cg *ConfigGenerator) generatePodMonitorConfig(
 	}
 
 	labeler := namespacelabeler.New(cpf.EnforcedNamespaceLabel, cpf.ExcludedFromEnforcement, false)
-	relabelings = append(relabelings, generateRelabelConfig(labeler.GetRelabelingConfigs(m.TypeMeta, m.ObjectMeta, ep.RelabelConfigs))...)
+	//rashmi
+	relabelConfigsPmon := generateRelabelConfig(labeler.GetRelabelingConfigs(m.TypeMeta, m.ObjectMeta, ep.RelabelConfigs))
+	for _, relabelConfigPmon := range relabelConfigsPmon {
+		if err = validateRelabelConfig(cg.prom, relabelConfigPmon); err != nil {
+			level.Warn(cg.logger).Log("msg", fmt.Sprintf("Error validating relabel config for podMonitor/%s/%s, ignoring pod monitor", m.Namespace, m.Name))
+			return nil
+		}
+	}
+
+	relabelings = append(relabelings, relabelConfigsPmon...)
 
 	relabelings = generateAddressShardingRelabelingRules(relabelings, shards)
 	cfg = append(cfg, yaml.MapItem{Key: "relabel_configs", Value: relabelings})
@@ -845,17 +854,17 @@ func (cg *ConfigGenerator) generatePodMonitorConfig(
 	cfg = append(cfg, yaml.MapItem{Key: "metric_relabel_configs", Value: generateRelabelConfig(labeler.GetRelabelingConfigs(m.TypeMeta, m.ObjectMeta, ep.MetricRelabelConfigs))})
 
 	// Validation here to make sure generated pod monitor config is a valid scrape config
-	promScrapeCfg := &promconfig.ScrapeConfig{}
-	marshalledCfg, err := yaml.Marshal(cfg)
-	if err != nil {
-		level.Warn(cg.logger).Log("msg", fmt.Sprintf("Error marshalling podMonitor/%s/%s to byte array, ignoring", m.Namespace, m.Name))
-		return nil
-	}
-	unmarshalErr := yaml.Unmarshal(marshalledCfg, promScrapeCfg)
-	if unmarshalErr != nil {
-		level.Warn(cg.logger).Log("msg", fmt.Sprintf("Error unmarshalling podMonitor/%s/%s to valid prometheus scrape config, ignoring", m.Namespace, m.Name))
-		return nil
-	}
+	// promScrapeCfg := &promconfig.ScrapeConfig{}
+	// marshalledCfg, err := yaml.Marshal(cfg)
+	// if err != nil {
+	// 	level.Warn(cg.logger).Log("msg", fmt.Sprintf("Error marshalling podMonitor/%s/%s to byte array, ignoring", m.Namespace, m.Name))
+	// 	return nil
+	// }
+	// unmarshalErr := yaml.Unmarshal(marshalledCfg, promScrapeCfg)
+	// if unmarshalErr != nil {
+	// 	level.Warn(cg.logger).Log("msg", fmt.Sprintf("Error unmarshalling podMonitor/%s/%s to valid prometheus scrape config, ignoring", m.Namespace, m.Name))
+	// 	return nil
+	// }
 
 	return cfg
 }
