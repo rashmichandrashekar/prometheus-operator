@@ -846,11 +846,11 @@ func (cg *ConfigGenerator) generatePodMonitorConfig(
 
 	// Validation here to make sure generated pod monitor config is a valid scrape config
 	promScrapeCfg := &promconfig.ScrapeConfig{}
-	marshalledCfg, err := yaml.Marshal(cfg)
-	if err != nil {
-		return nil
-	}
-	unmarshalErr := yaml.Unmarshal(marshalledCfg, promScrapeCfg)
+	// marshalledCfg, err := yaml.Marshal(cfg)
+	// if err != nil {
+	// 	return nil
+	// }
+	unmarshalErr := yaml.Unmarshal([]byte(cfg), promScrapeCfg)
 	if unmarshalErr != nil {
 		return nil
 	}
