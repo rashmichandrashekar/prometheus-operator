@@ -34,7 +34,7 @@ import (
 	"github.com/prometheus-operator/prometheus-operator/pkg/assets"
 	namespacelabeler "github.com/prometheus-operator/prometheus-operator/pkg/namespacelabeler"
 	"github.com/prometheus-operator/prometheus-operator/pkg/operator"
-	promconfig "github.com/prometheus/prometheus/config"
+	// promconfig "github.com/prometheus/prometheus/config"
 )
 
 const (
@@ -828,15 +828,14 @@ func (cg *ConfigGenerator) generatePodMonitorConfig(
 
 	labeler := namespacelabeler.New(cpf.EnforcedNamespaceLabel, cpf.ExcludedFromEnforcement, false)
 	//rashmi
-	relabelConfigsPmon := generateRelabelConfig(labeler.GetRelabelingConfigs(m.TypeMeta, m.ObjectMeta, ep.RelabelConfigs))
-	for _, relabelConfigPmon := range relabelConfigsPmon {
-		if err = validateRelabelConfig(cg.prom, relabelConfigPmon); err != nil {
+	for _, relabelConfigPmon := range ep.RelabelConfigs {
+		if err := validateRelabelConfig(cg.prom, *relabelConfigPmon); err != nil {
 			level.Warn(cg.logger).Log("msg", fmt.Sprintf("Error validating relabel config for podMonitor/%s/%s, ignoring pod monitor", m.Namespace, m.Name))
 			return nil
 		}
 	}
 
-	relabelings = append(relabelings, relabelConfigsPmon...)
+	relabelings = append(relabelings, generateRelabelConfig(labeler.GetRelabelingConfigs(m.TypeMeta, m.ObjectMeta, ep.RelabelConfigs))...)
 
 	relabelings = generateAddressShardingRelabelingRules(relabelings, shards)
 	cfg = append(cfg, yaml.MapItem{Key: "relabel_configs", Value: relabelings})
