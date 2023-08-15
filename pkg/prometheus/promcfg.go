@@ -34,6 +34,7 @@ import (
 	"github.com/prometheus-operator/prometheus-operator/pkg/assets"
 	namespacelabeler "github.com/prometheus-operator/prometheus-operator/pkg/namespacelabeler"
 	"github.com/prometheus-operator/prometheus-operator/pkg/operator"
+	promconfig "github.com/prometheus/prometheus/config"
 )
 
 const (
@@ -842,6 +843,13 @@ func (cg *ConfigGenerator) generatePodMonitorConfig(
 	}
 
 	cfg = append(cfg, yaml.MapItem{Key: "metric_relabel_configs", Value: generateRelabelConfig(labeler.GetRelabelingConfigs(m.TypeMeta, m.ObjectMeta, ep.MetricRelabelConfigs))})
+
+	// Validation here to make sure generated pod monitor config is a valid scrape config
+	promScrapeCfg := &promconfig.ScrapeConfig{}
+	unmarshalErr := yaml.Unmarshal(cfg, promScrapeCfg)
+	if unmarshalErr != nil {
+		return nil
+	}
 
 	return cfg
 }
@@ -1996,14 +2004,15 @@ func (cg *ConfigGenerator) appendPodMonitorConfigs(
 
 	for _, identifier := range pMonIdentifiers {
 		for i, ep := range podMonitors[identifier].Spec.PodMetricsEndpoints {
-			slices = append(slices,
-				cg.WithKeyVals("pod_monitor", identifier).generatePodMonitorConfig(
-					podMonitors[identifier], ep, i,
-					apiserverConfig,
-					store,
-					shards,
-				),
+			podMonitorScrapeConfig := cg.WithKeyVals("pod_monitor", identifier).generatePodMonitorConfig(
+				podMonitors[identifier], ep, i,
+				apiserverConfig,
+				store,
+				shards,
 			)
+			if podMonitorScrapeConfig != nil {
+				slices = append(slices, podMonitorScrapeConfig)
+			}
 		}
 	}
 
