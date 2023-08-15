@@ -34,7 +34,6 @@ import (
 	"github.com/prometheus-operator/prometheus-operator/pkg/assets"
 	namespacelabeler "github.com/prometheus-operator/prometheus-operator/pkg/namespacelabeler"
 	"github.com/prometheus-operator/prometheus-operator/pkg/operator"
-	// promconfig "github.com/prometheus/prometheus/config"
 )
 
 const (
@@ -826,15 +825,15 @@ func (cg *ConfigGenerator) generatePodMonitorConfig(
 		})
 	}
 
-	labeler := namespacelabeler.New(cpf.EnforcedNamespaceLabel, cpf.ExcludedFromEnforcement, false)
-	//rashmi
+	//validate relabel config for podmonitor
 	for _, relabelConfigPmon := range ep.RelabelConfigs {
 		if err := validateRelabelConfig(cg.prom, *relabelConfigPmon); err != nil {
-			level.Warn(cg.logger).Log("msg", fmt.Sprintf("Error validating relabel config for podMonitor/%s/%s, ignoring pod monitor", m.Namespace, m.Name))
+			level.Warn(cg.logger).Log("msg", fmt.Sprintf("Error validating relabel config for podMonitor/%s/%s - %v, ignoring pod monitor", m.Namespace, m.Name, err))
 			return nil
 		}
 	}
 
+	labeler := namespacelabeler.New(cpf.EnforcedNamespaceLabel, cpf.ExcludedFromEnforcement, false)
 	relabelings = append(relabelings, generateRelabelConfig(labeler.GetRelabelingConfigs(m.TypeMeta, m.ObjectMeta, ep.RelabelConfigs))...)
 
 	relabelings = generateAddressShardingRelabelingRules(relabelings, shards)
@@ -850,20 +849,15 @@ func (cg *ConfigGenerator) generatePodMonitorConfig(
 		cfg = cg.WithMinimumVersion("2.28.0").AppendMapItem(cfg, "body_size_limit", cpf.EnforcedBodySizeLimit)
 	}
 
-	cfg = append(cfg, yaml.MapItem{Key: "metric_relabel_configs", Value: generateRelabelConfig(labeler.GetRelabelingConfigs(m.TypeMeta, m.ObjectMeta, ep.MetricRelabelConfigs))})
+	//validate metric relabel config for podmonitor
+	for _, metricRelabelConfigPmon := range ep.MetricRelabelConfigs {
+		if err := validateRelabelConfig(cg.prom, *metricRelabelConfigPmon); err != nil {
+			level.Warn(cg.logger).Log("msg", fmt.Sprintf("Error validating metric relabel config for podMonitor/%s/%s - %v, ignoring pod monitor", m.Namespace, m.Name, err))
+			return nil
+		}
+	}
 
-	// Validation here to make sure generated pod monitor config is a valid scrape config
-	// promScrapeCfg := &promconfig.ScrapeConfig{}
-	// marshalledCfg, err := yaml.Marshal(cfg)
-	// if err != nil {
-	// 	level.Warn(cg.logger).Log("msg", fmt.Sprintf("Error marshalling podMonitor/%s/%s to byte array, ignoring", m.Namespace, m.Name))
-	// 	return nil
-	// }
-	// unmarshalErr := yaml.Unmarshal(marshalledCfg, promScrapeCfg)
-	// if unmarshalErr != nil {
-	// 	level.Warn(cg.logger).Log("msg", fmt.Sprintf("Error unmarshalling podMonitor/%s/%s to valid prometheus scrape config, ignoring", m.Namespace, m.Name))
-	// 	return nil
-	// }
+	cfg = append(cfg, yaml.MapItem{Key: "metric_relabel_configs", Value: generateRelabelConfig(labeler.GetRelabelingConfigs(m.TypeMeta, m.ObjectMeta, ep.MetricRelabelConfigs))})
 
 	return cfg
 }
@@ -1341,6 +1335,14 @@ func (cg *ConfigGenerator) generateServiceMonitorConfig(
 		})
 	}
 
+	//validate relabel config for servicemonitor
+	for _, relabelConfigSmon := range ep.RelabelConfigs {
+		if err := validateRelabelConfig(cg.prom, *relabelConfigSmon); err != nil {
+			level.Warn(cg.logger).Log("msg", fmt.Sprintf("Error validating relabel config for serviceMonitor/%s/%s - %v, ignoring service monitor", m.Namespace, m.Name, err))
+			return nil
+		}
+	}
+
 	labeler := namespacelabeler.New(cpf.EnforcedNamespaceLabel, cpf.ExcludedFromEnforcement, false)
 	relabelings = append(relabelings, generateRelabelConfig(labeler.GetRelabelingConfigs(m.TypeMeta, m.ObjectMeta, ep.RelabelConfigs))...)
 
@@ -1355,6 +1357,14 @@ func (cg *ConfigGenerator) generateServiceMonitorConfig(
 
 	if cpf.EnforcedBodySizeLimit != "" {
 		cfg = cg.WithMinimumVersion("2.28.0").AppendMapItem(cfg, "body_size_limit", cpf.EnforcedBodySizeLimit)
+	}
+
+	//validate metric relabel config for servicemonitor
+	for _, metricRelabelConfigSmon := range ep.MetricRelabelConfigs {
+		if err := validateRelabelConfig(cg.prom, *metricRelabelConfigSmon); err != nil {
+			level.Warn(cg.logger).Log("msg", fmt.Sprintf("Error validating metric relabel config for serviceMonitor/%s/%s - %v, ignoring service monitor", m.Namespace, m.Name, err))
+			return nil
+		}
 	}
 
 	cfg = append(cfg, yaml.MapItem{Key: "metric_relabel_configs", Value: generateRelabelConfig(labeler.GetRelabelingConfigs(m.TypeMeta, m.ObjectMeta, ep.MetricRelabelConfigs))})
@@ -1985,15 +1995,17 @@ func (cg *ConfigGenerator) appendServiceMonitorConfigs(
 
 	for _, identifier := range sMonIdentifiers {
 		for i, ep := range serviceMonitors[identifier].Spec.Endpoints {
-			slices = append(slices,
-				cg.WithKeyVals("service_monitor", identifier).generateServiceMonitorConfig(
-					serviceMonitors[identifier],
-					ep, i,
-					apiserverConfig,
-					store,
-					shards,
-				),
+
+			svcMonitorScrapeConfig := cg.WithKeyVals("service_monitor", identifier).generateServiceMonitorConfig(
+				serviceMonitors[identifier],
+				ep, i,
+				apiserverConfig,
+				store,
+				shards,
 			)
+			if svcMonitorScrapeConfig != nil {
+				slices = append(slices, svcMonitorScrapeConfig)
+			}
 		}
 	}
 
