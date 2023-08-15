@@ -846,12 +846,14 @@ func (cg *ConfigGenerator) generatePodMonitorConfig(
 
 	// Validation here to make sure generated pod monitor config is a valid scrape config
 	promScrapeCfg := &promconfig.ScrapeConfig{}
-	// marshalledCfg, err := yaml.Marshal(cfg)
-	// if err != nil {
-	// 	return nil
-	// }
-	unmarshalErr := yaml.Unmarshal([]byte(cfg), promScrapeCfg)
+	marshalledCfg, err := yaml.Marshal(cfg)
+	if err != nil {
+		level.Warn(cg.logger).Log("msg", fmt.Sprintf("Error marshalling podMonitor/%s/%s to byte array, ignoring", m.Namespace, m.Name))
+		return nil
+	}
+	unmarshalErr := yaml.Unmarshal(marshalledCfg, promScrapeCfg)
 	if unmarshalErr != nil {
+		level.Warn(cg.logger).Log("msg", fmt.Sprintf("Error unmarshalling podMonitor/%s/%s to valid prometheus scrape config, ignoring", m.Namespace, m.Name))
 		return nil
 	}
 
