@@ -401,11 +401,11 @@ func (f *Framework) CreateOrUpdatePrometheusOperatorWithOpts(
 		for i, arg := range deploy.Spec.Template.Spec.Containers[0].Args {
 			if strings.Contains(arg, "--prometheus-config-reloader=") {
 				deploy.Spec.Template.Spec.Containers[0].Args[i] = "--prometheus-config-reloader=" +
-					"quay.io/prometheus-operator/prometheus-config-reloader:" +
+					"docker.io/rashmichandrashekarms/po/prometheus-config-reloader:" +
 					repoAndTag[1]
 			}
 		}
-		webhookServerImage = "quay.io/prometheus-operator/admission-webhook:" + repoAndTag[1]
+		webhookServerImage = "docker.io/rashmichandrashekarms/po/admission-webhook:" + repoAndTag[1]
 	}
 
 	deploy.Name = prometheusOperatorServiceDeploymentName
