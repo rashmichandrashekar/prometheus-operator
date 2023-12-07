@@ -2,6 +2,12 @@ module github.com/prometheus-operator/prometheus-operator
 
 go 1.21
 
+replace github.com/prometheus-operator/prometheus-operator => github.com/rashmichandrashekar/prometheus-operator v0.67.1-0.20231207011625-13f7379e534d
+
+replace github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring => github.com/rashmichandrashekar/prometheus-operator/pkg/apis/monitoring v0.67.1-0.20231207011625-13f7379e534d
+
+replace github.com/prometheus-operator/prometheus-operator/pkg/client => github.com/rashmichandrashekar/prometheus-operator/pkg/client v0.67.1-0.20231207011625-13f7379e534d
+
 require (
 	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137
@@ -70,7 +76,7 @@ require (
 	github.com/evanphx/json-patch v5.6.0+incompatible // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
-	github.com/go-logr/logr v1.2.4
+	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/analysis v0.21.4 // indirect
 	github.com/go-openapi/errors v0.20.4 // indirect
@@ -135,8 +141,6 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.3.0 // indirect
 )
 
-replace (
-	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring => ./pkg/apis/monitoring
-	github.com/prometheus-operator/prometheus-operator/pkg/client => ./pkg/client
-	k8s.io/klog/v2 => github.com/simonpasquier/klog-gokit/v3 v3.3.0
-)
+// github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring => ./pkg/apis/monitoring
+// github.com/prometheus-operator/prometheus-operator/pkg/client => ./pkg/client
+replace k8s.io/klog/v2 => github.com/simonpasquier/klog-gokit/v3 v3.3.0
