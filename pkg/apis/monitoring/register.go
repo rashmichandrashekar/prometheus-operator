@@ -14,6 +14,6 @@
 
 package monitoring
 
-var (
+const (
 	GroupName = "monitoring.coreos.com"
 )
