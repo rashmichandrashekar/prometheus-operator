@@ -3362,6 +3362,7 @@ func TestRemoteReadConfig(t *testing.T) {
 
 func TestRemoteWriteConfig(t *testing.T) {
 	sendNativeHistograms := true
+	enableHTTP2 := false
 	for _, tc := range []struct {
 		version     string
 		remoteWrite monitoringv1.RemoteWriteSpec
@@ -3630,6 +3631,7 @@ func TestRemoteWriteConfig(t *testing.T) {
 			remoteWrite: monitoringv1.RemoteWriteSpec{
 				URL:                  "http://example.com",
 				SendNativeHistograms: &sendNativeHistograms,
+				EnableHttp2:          &enableHTTP2,
 				QueueConfig: &monitoringv1.QueueConfig{
 					Capacity:          1000,
 					MinShards:         1,
@@ -5936,6 +5938,116 @@ func TestScrapeConfigSpecConfigWithGCESD(t *testing.T) {
 				nil,
 				scs,
 				nil,
+				nil,
+				nil,
+				nil,
+				nil,
+			)
+			if tc.expectedErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			golden.Assert(t, string(cfg), tc.golden)
+		})
+	}
+}
+
+func TestScrapeConfigSpecConfigWithOpenStackSD(t *testing.T) {
+	c := fake.NewSimpleClientset(
+		&v1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "openstack-access-secret",
+				Namespace: "default",
+			},
+			Data: map[string][]byte{
+				"password":                     []byte("password"),
+				"applicationCredentialsSecret": []byte("application-credentials"),
+			},
+		},
+	)
+	for _, tc := range []struct {
+		name        string
+		scSpec      monitoringv1alpha1.ScrapeConfigSpec
+		golden      string
+		expectedErr bool
+	}{
+		{
+			name: "openstack_sd_config_valid",
+			scSpec: monitoringv1alpha1.ScrapeConfigSpec{
+				OpenStackSDConfigs: []monitoringv1alpha1.OpenStackSDConfig{
+					{
+						Role:             "Instance",
+						Region:           "region-1",
+						IdentityEndpoint: ptr.To("http://identity.example.com:5000/v2.0"),
+						Username:         ptr.To("nova-user-1"),
+						Password: &v1.SecretKeySelector{
+							LocalObjectReference: v1.LocalObjectReference{
+								Name: "openstack-access-secret",
+							},
+							Key: "password",
+						},
+						DomainName:      ptr.To("devops-project-1"),
+						RefreshInterval: (*monitoringv1.Duration)(ptr.To("30s")),
+						Port:            ptr.To(9100),
+					},
+				},
+			},
+			golden: "ScrapeConfigSpecConfig_OpenStackSDConfigValid.golden",
+		},
+		{
+			name: "openstack_sd_config_invalid_secret_ref",
+			scSpec: monitoringv1alpha1.ScrapeConfigSpec{
+				OpenStackSDConfigs: []monitoringv1alpha1.OpenStackSDConfig{
+					{
+						Role:   "Instance",
+						Region: "region-1",
+						ApplicationCredentialSecret: &v1.SecretKeySelector{
+							LocalObjectReference: v1.LocalObjectReference{
+								Name: "openstack-access-secret",
+							},
+							Key: "invalid-key",
+						},
+					},
+				},
+			},
+			expectedErr: true,
+		},
+		{
+			name: "openstack_sd_config_empty",
+			scSpec: monitoringv1alpha1.ScrapeConfigSpec{
+				OpenStackSDConfigs: []monitoringv1alpha1.OpenStackSDConfig{},
+			},
+			golden: "ScrapeConfigSpecConfig_OpenStackSDConfigEmpty.golden",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			scs := map[string]*monitoringv1alpha1.ScrapeConfig{
+				"sc": {
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "testscrapeconfig1",
+						Namespace: "default",
+					},
+					Spec: tc.scSpec,
+				},
+			}
+
+			p := defaultPrometheus()
+			cg := mustNewConfigGenerator(t, p)
+			cfg, err := cg.GenerateServerConfiguration(
+				context.Background(),
+				p.Spec.EvaluationInterval,
+				p.Spec.QueryLogFile,
+				nil,
+				nil,
+				p.Spec.TSDB,
+				nil,
+				nil,
+				nil,
+				nil,
+				nil,
+				scs,
+				assets.NewStore(c.CoreV1(), c.CoreV1()),
 				nil,
 				nil,
 				nil,

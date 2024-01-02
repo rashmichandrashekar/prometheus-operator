@@ -17,6 +17,7 @@ package prometheus
 import (
 	"bytes"
 	"fmt"
+	"math"
 	"net/url"
 	"path"
 	"path/filepath"
@@ -52,11 +53,6 @@ const (
 )
 
 var (
-	managedByOperatorLabel      = "managed-by"
-	managedByOperatorLabelValue = "prometheus-operator"
-	ManagedByOperatorLabels     = map[string]string{
-		managedByOperatorLabel: managedByOperatorLabelValue,
-	}
 	ShardLabelName                = "operator.prometheus.io/shard"
 	PrometheusNameLabelName       = "operator.prometheus.io/name"
 	PrometheusModeLabeLName       = "operator.prometheus.io/mode"
@@ -126,26 +122,21 @@ func MakeConfigurationSecret(p monitoringv1.PrometheusInterface, config Config, 
 		return nil, err
 	}
 
-	objMeta := p.GetObjectMeta()
-	typeMeta := p.GetTypeMeta()
-	return &v1.Secret{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:        ConfigSecretName(p),
-			Annotations: config.Annotations,
-			Labels:      config.Labels.Merge(ManagedByOperatorLabels),
-			OwnerReferences: []metav1.OwnerReference{{
-				APIVersion:         typeMeta.APIVersion,
-				BlockOwnerDeletion: ptr.To(true),
-				Controller:         ptr.To(true),
-				Kind:               typeMeta.Kind,
-				Name:               objMeta.GetName(),
-				UID:                objMeta.GetUID(),
-			}},
-		},
+	s := &v1.Secret{
 		Data: map[string][]byte{
 			ConfigFilename: promConfig,
 		},
-	}, nil
+	}
+
+	operator.UpdateObject(
+		s,
+		operator.WithLabels(config.Labels),
+		operator.WithAnnotations(config.Annotations),
+		operator.WithManagingOwner(p),
+		operator.WithName(ConfigSecretName(p)),
+	)
+
+	return s, nil
 }
 
 func ConfigSecretName(p monitoringv1.PrometheusInterface) string {
@@ -525,4 +516,18 @@ func MakeK8sTopologySpreadConstraint(selectorLabels map[string]string, tscs []mo
 	}
 
 	return coreTscs
+}
+
+func GetStatupProbePeriodSecondsAndFailureThreshold(cfp monitoringv1.CommonPrometheusFields) (int32, int32) {
+	var startupPeriodSeconds float64 = 15
+	var startupFailureThreshold float64 = 60
+
+	maximumStartupDurationSeconds := float64(ptr.Deref(cfp.MaximumStartupDurationSeconds, 0))
+
+	if maximumStartupDurationSeconds >= 60 {
+		startupFailureThreshold = math.Ceil(maximumStartupDurationSeconds / 60)
+		startupPeriodSeconds = math.Ceil(maximumStartupDurationSeconds / startupFailureThreshold)
+	}
+
+	return int32(startupPeriodSeconds), int32(startupFailureThreshold)
 }

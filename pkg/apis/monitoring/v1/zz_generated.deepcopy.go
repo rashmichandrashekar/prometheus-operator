@@ -356,6 +356,11 @@ func (in *AlertmanagerSpec) DeepCopyInto(out *AlertmanagerSpec) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
+	if in.ClusterLabel != nil {
+		in, out := &in.ClusterLabel, &out.ClusterLabel
+		*out = new(string)
+		**out = **in
+	}
 	if in.AlertmanagerConfigSelector != nil {
 		in, out := &in.AlertmanagerConfigSelector, &out.AlertmanagerConfigSelector
 		*out = new(metav1.LabelSelector)
@@ -896,6 +901,11 @@ func (in *CommonPrometheusFields) DeepCopyInto(out *CommonPrometheusFields) {
 	if in.ReloadStrategy != nil {
 		in, out := &in.ReloadStrategy, &out.ReloadStrategy
 		*out = new(ReloadStrategyType)
+		**out = **in
+	}
+	if in.MaximumStartupDurationSeconds != nil {
+		in, out := &in.MaximumStartupDurationSeconds, &out.MaximumStartupDurationSeconds
+		*out = new(int32)
 		**out = **in
 	}
 }
@@ -2387,6 +2397,11 @@ func (in *RemoteWriteSpec) DeepCopyInto(out *RemoteWriteSpec) {
 	if in.MetadataConfig != nil {
 		in, out := &in.MetadataConfig, &out.MetadataConfig
 		*out = new(MetadataConfig)
+		**out = **in
+	}
+	if in.EnableHttp2 != nil {
+		in, out := &in.EnableHttp2, &out.EnableHttp2
+		*out = new(bool)
 		**out = **in
 	}
 }

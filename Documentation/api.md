@@ -165,8 +165,7 @@ string
 <td>
 <p>Tag of Alertmanager container image to be deployed. Defaults to the value of <code>version</code>.
 Version is ignored if Tag is set.
-Deprecated: use &lsquo;image&rsquo; instead.  The image tag can be specified
-as part of the image URL.</p>
+Deprecated: use &lsquo;image&rsquo; instead. The image tag can be specified as part of the image URL.</p>
 </td>
 </tr>
 <tr>
@@ -180,8 +179,7 @@ string
 <p>SHA of Alertmanager container image to be deployed. Defaults to the value of <code>version</code>.
 Similar to a tag, but the SHA explicitly deploys an immutable container image.
 Version and Tag are ignored if SHA is set.
-Deprecated: use &lsquo;image&rsquo; instead.  The image digest can be specified
-as part of the image URL.</p>
+Deprecated: use &lsquo;image&rsquo; instead. The image digest can be specified as part of the image URL.</p>
 </td>
 </tr>
 <tr>
@@ -193,7 +191,7 @@ string
 </td>
 <td>
 <p>Base image that is used to deploy pods, without tag.
-Deprecated: use &lsquo;image&rsquo; instead</p>
+Deprecated: use &lsquo;image&rsquo; instead.</p>
 </td>
 </tr>
 <tr>
@@ -580,6 +578,18 @@ GoDuration
 </td>
 <td>
 <p>Interval between gossip attempts.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>clusterLabel</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Defines the identifier that uniquely identifies the Alertmanager cluster.
+You should only set it when the Alertmanager cluster includes Alertmanager instances which are external to this Alertmanager resource. In practice, the addresses of the external instances are provided via the <code>.spec.additionalPeers</code> field.</p>
 </td>
 </tr>
 <tr>
@@ -2562,13 +2572,26 @@ If not specified, the configuration is reloaded using the /-/reload HTTP endpoin
 </tr>
 <tr>
 <td>
+<code>maximumStartupDurationSeconds</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Defines the maximum time that the <code>prometheus</code> container&rsquo;s startup probe will wait before being considered failed. The startup probe will return success after the WAL replay is complete.
+If set, the value should be greater than 60 (seconds). Otherwise it will be equal to 600 seconds (15 minutes).</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>baseImage</code><br/>
 <em>
 string
 </em>
 </td>
 <td>
-<p><em>Deprecated: use &lsquo;spec.image&rsquo; instead.</em></p>
+<p>Deprecated: use &lsquo;spec.image&rsquo; instead.</p>
 </td>
 </tr>
 <tr>
@@ -2579,8 +2602,7 @@ string
 </em>
 </td>
 <td>
-<p><em>Deprecated: use &lsquo;spec.image&rsquo; instead. The image&rsquo;s tag can be specified
-as part of the image name.</em></p>
+<p>Deprecated: use &lsquo;spec.image&rsquo; instead. The image&rsquo;s tag can be specified as part of the image name.</p>
 </td>
 </tr>
 <tr>
@@ -2591,8 +2613,7 @@ string
 </em>
 </td>
 <td>
-<p><em>Deprecated: use &lsquo;spec.image&rsquo; instead. The image&rsquo;s digest can be
-specified as part of the image name.</em></p>
+<p>Deprecated: use &lsquo;spec.image&rsquo; instead. The image&rsquo;s digest can be specified as part of the image name.</p>
 </td>
 </tr>
 <tr>
@@ -2660,7 +2681,7 @@ Rules
 <p>Defines the list of PrometheusRule objects to which the namespace label
 enforcement doesn&rsquo;t apply.
 This is only relevant when <code>spec.enforcedNamespaceLabel</code> is set to true.
-<em>Deprecated: use <code>spec.excludedFromEnforcement</code> instead.</em></p>
+Deprecated: use <code>spec.excludedFromEnforcement</code> instead.</p>
 </td>
 </tr>
 <tr>
@@ -2831,7 +2852,7 @@ bool
 <td>
 <p>AllowOverlappingBlocks enables vertical compaction and vertical query
 merge in Prometheus.</p>
-<p><em>Deprecated: this flag has no effect for Prometheus &gt;= 2.39.0 where overlapping blocks are enabled by default.</em></p>
+<p>Deprecated: this flag has no effect for Prometheus &gt;= 2.39.0 where overlapping blocks are enabled by default.</p>
 </td>
 </tr>
 <tr>
@@ -4047,7 +4068,7 @@ string
 <td>
 <p>File to read bearer token for accessing apiserver.</p>
 <p>Cannot be set at the same time as <code>basicAuth</code>, <code>authorization</code>, or <code>bearerToken</code>.</p>
-<p><em>Deprecated: this will be removed in a future release. Prefer using <code>authorization</code>.</em></p>
+<p>Deprecated: this will be removed in a future release. Prefer using <code>authorization</code>.</p>
 </td>
 </tr>
 <tr>
@@ -4090,7 +4111,7 @@ string
 <td>
 <p><em>Warning: this field shouldn&rsquo;t be used because the token value appears
 in clear-text. Prefer using <code>authorization</code>.</em></p>
-<p><em>Deprecated: this will be removed in a future release.</em></p>
+<p>Deprecated: this will be removed in a future release.</p>
 </td>
 </tr>
 </tbody>
@@ -4351,7 +4372,7 @@ string
 <td>
 <p>File to read bearer token for Alertmanager.</p>
 <p>Cannot be set at the same time as <code>basicAuth</code>, <code>authorization</code>, or <code>sigv4</code>.</p>
-<p><em>Deprecated: this will be removed in a future release. Prefer using <code>authorization</code>.</em></p>
+<p>Deprecated: this will be removed in a future release. Prefer using <code>authorization</code>.</p>
 </td>
 </tr>
 <tr>
@@ -4622,8 +4643,7 @@ string
 <td>
 <p>Tag of Alertmanager container image to be deployed. Defaults to the value of <code>version</code>.
 Version is ignored if Tag is set.
-Deprecated: use &lsquo;image&rsquo; instead.  The image tag can be specified
-as part of the image URL.</p>
+Deprecated: use &lsquo;image&rsquo; instead. The image tag can be specified as part of the image URL.</p>
 </td>
 </tr>
 <tr>
@@ -4637,8 +4657,7 @@ string
 <p>SHA of Alertmanager container image to be deployed. Defaults to the value of <code>version</code>.
 Similar to a tag, but the SHA explicitly deploys an immutable container image.
 Version and Tag are ignored if SHA is set.
-Deprecated: use &lsquo;image&rsquo; instead.  The image digest can be specified
-as part of the image URL.</p>
+Deprecated: use &lsquo;image&rsquo; instead. The image digest can be specified as part of the image URL.</p>
 </td>
 </tr>
 <tr>
@@ -4650,7 +4669,7 @@ string
 </td>
 <td>
 <p>Base image that is used to deploy pods, without tag.
-Deprecated: use &lsquo;image&rsquo; instead</p>
+Deprecated: use &lsquo;image&rsquo; instead.</p>
 </td>
 </tr>
 <tr>
@@ -5037,6 +5056,18 @@ GoDuration
 </td>
 <td>
 <p>Interval between gossip attempts.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>clusterLabel</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Defines the identifier that uniquely identifies the Alertmanager cluster.
+You should only set it when the Alertmanager cluster includes Alertmanager instances which are external to this Alertmanager resource. In practice, the addresses of the external instances are provided via the <code>.spec.additionalPeers</code> field.</p>
 </td>
 </tr>
 <tr>
@@ -6944,6 +6975,19 @@ ReloadStrategyType
 If not specified, the configuration is reloaded using the /-/reload HTTP endpoint.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>maximumStartupDurationSeconds</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Defines the maximum time that the <code>prometheus</code> container&rsquo;s startup probe will wait before being considered failed. The startup probe will return success after the WAL replay is complete.
+If set, the value should be greater than 60 (seconds). Otherwise it will be equal to 600 seconds (15 minutes).</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="monitoring.coreos.com/v1.Condition">Condition
@@ -7302,7 +7346,7 @@ be ignored. A null or empty list means only match against labelSelector.</p>
 <h3 id="monitoring.coreos.com/v1.Duration">Duration
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#monitoring.coreos.com/v1.AlertmanagerEndpoints">AlertmanagerEndpoints</a>, <a href="#monitoring.coreos.com/v1.AlertmanagerGlobalConfig">AlertmanagerGlobalConfig</a>, <a href="#monitoring.coreos.com/v1.CommonPrometheusFields">CommonPrometheusFields</a>, <a href="#monitoring.coreos.com/v1.Endpoint">Endpoint</a>, <a href="#monitoring.coreos.com/v1.MetadataConfig">MetadataConfig</a>, <a href="#monitoring.coreos.com/v1.PodMetricsEndpoint">PodMetricsEndpoint</a>, <a href="#monitoring.coreos.com/v1.ProbeSpec">ProbeSpec</a>, <a href="#monitoring.coreos.com/v1.PrometheusSpec">PrometheusSpec</a>, <a href="#monitoring.coreos.com/v1.PrometheusTracingConfig">PrometheusTracingConfig</a>, <a href="#monitoring.coreos.com/v1.QuerySpec">QuerySpec</a>, <a href="#monitoring.coreos.com/v1.RemoteReadSpec">RemoteReadSpec</a>, <a href="#monitoring.coreos.com/v1.RemoteWriteSpec">RemoteWriteSpec</a>, <a href="#monitoring.coreos.com/v1.Rule">Rule</a>, <a href="#monitoring.coreos.com/v1.RuleGroup">RuleGroup</a>, <a href="#monitoring.coreos.com/v1.TSDBSpec">TSDBSpec</a>, <a href="#monitoring.coreos.com/v1.ThanosRulerSpec">ThanosRulerSpec</a>, <a href="#monitoring.coreos.com/v1.ThanosSpec">ThanosSpec</a>, <a href="#monitoring.coreos.com/v1alpha1.AzureSDConfig">AzureSDConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.ConsulSDConfig">ConsulSDConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.DNSSDConfig">DNSSDConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.EC2SDConfig">EC2SDConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.FileSDConfig">FileSDConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.GCESDConfig">GCESDConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.HTTPSDConfig">HTTPSDConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.ScrapeConfigSpec">ScrapeConfigSpec</a>)
+(<em>Appears on:</em><a href="#monitoring.coreos.com/v1.AlertmanagerEndpoints">AlertmanagerEndpoints</a>, <a href="#monitoring.coreos.com/v1.AlertmanagerGlobalConfig">AlertmanagerGlobalConfig</a>, <a href="#monitoring.coreos.com/v1.CommonPrometheusFields">CommonPrometheusFields</a>, <a href="#monitoring.coreos.com/v1.Endpoint">Endpoint</a>, <a href="#monitoring.coreos.com/v1.MetadataConfig">MetadataConfig</a>, <a href="#monitoring.coreos.com/v1.PodMetricsEndpoint">PodMetricsEndpoint</a>, <a href="#monitoring.coreos.com/v1.ProbeSpec">ProbeSpec</a>, <a href="#monitoring.coreos.com/v1.PrometheusSpec">PrometheusSpec</a>, <a href="#monitoring.coreos.com/v1.PrometheusTracingConfig">PrometheusTracingConfig</a>, <a href="#monitoring.coreos.com/v1.QuerySpec">QuerySpec</a>, <a href="#monitoring.coreos.com/v1.RemoteReadSpec">RemoteReadSpec</a>, <a href="#monitoring.coreos.com/v1.RemoteWriteSpec">RemoteWriteSpec</a>, <a href="#monitoring.coreos.com/v1.Rule">Rule</a>, <a href="#monitoring.coreos.com/v1.RuleGroup">RuleGroup</a>, <a href="#monitoring.coreos.com/v1.TSDBSpec">TSDBSpec</a>, <a href="#monitoring.coreos.com/v1.ThanosRulerSpec">ThanosRulerSpec</a>, <a href="#monitoring.coreos.com/v1.ThanosSpec">ThanosSpec</a>, <a href="#monitoring.coreos.com/v1alpha1.AzureSDConfig">AzureSDConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.ConsulSDConfig">ConsulSDConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.DNSSDConfig">DNSSDConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.EC2SDConfig">EC2SDConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.FileSDConfig">FileSDConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.GCESDConfig">GCESDConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.HTTPSDConfig">HTTPSDConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.OpenStackSDConfig">OpenStackSDConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.ScrapeConfigSpec">ScrapeConfigSpec</a>)
 </p>
 <div>
 <p>Duration is a valid time duration that can be parsed by Prometheus model.ParseDuration() function.
@@ -7454,8 +7498,8 @@ Kubernetes meta/v1.LabelSelector
 <td>
 <code>resources</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.24/#resourcerequirements-v1-core">
-Kubernetes core/v1.ResourceRequirements
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.24/#volumeresourcerequirements-v1-core">
+Kubernetes core/v1.VolumeResourceRequirements
 </a>
 </em>
 </td>
@@ -7565,6 +7609,29 @@ in any namespaces.
 (Alpha) Using the namespace field of dataSourceRef requires the CrossNamespaceVolumeDataSource feature gate to be enabled.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>volumeAttributesClassName</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>volumeAttributesClassName may be used to set the VolumeAttributesClass used by this claim.
+If specified, the CSI driver will create or update the volume with the attributes defined
+in the corresponding VolumeAttributesClass. This has a different purpose than storageClassName,
+it can be changed after the claim is created. An empty string value means that no VolumeAttributesClass
+will be applied to the claim but it&rsquo;s not allowed to reset this field to empty string once it is set.
+If unspecified and the PersistentVolumeClaim is unbound, the default VolumeAttributesClass
+will be set by the persistentvolume controller if it exists.
+If the resource referred to by volumeAttributesClass does not exist, this PersistentVolumeClaim will be
+set to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource
+exists.
+More info: <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes#volumeattributesclass">https://kubernetes.io/docs/concepts/storage/persistent-volumes#volumeattributesclass</a>
+(Alpha) Using this field requires the VolumeAttributesClass feature gate to be enabled.</p>
+</td>
+</tr>
 </table>
 </td>
 </tr>
@@ -7579,7 +7646,7 @@ Kubernetes core/v1.PersistentVolumeClaimStatus
 </td>
 <td>
 <em>(Optional)</em>
-<p><em>Deprecated: this field is never set.</em></p>
+<p>Deprecated: this field is never set.</p>
 </td>
 </tr>
 </tbody>
@@ -11060,13 +11127,26 @@ If not specified, the configuration is reloaded using the /-/reload HTTP endpoin
 </tr>
 <tr>
 <td>
+<code>maximumStartupDurationSeconds</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Defines the maximum time that the <code>prometheus</code> container&rsquo;s startup probe will wait before being considered failed. The startup probe will return success after the WAL replay is complete.
+If set, the value should be greater than 60 (seconds). Otherwise it will be equal to 600 seconds (15 minutes).</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>baseImage</code><br/>
 <em>
 string
 </em>
 </td>
 <td>
-<p><em>Deprecated: use &lsquo;spec.image&rsquo; instead.</em></p>
+<p>Deprecated: use &lsquo;spec.image&rsquo; instead.</p>
 </td>
 </tr>
 <tr>
@@ -11077,8 +11157,7 @@ string
 </em>
 </td>
 <td>
-<p><em>Deprecated: use &lsquo;spec.image&rsquo; instead. The image&rsquo;s tag can be specified
-as part of the image name.</em></p>
+<p>Deprecated: use &lsquo;spec.image&rsquo; instead. The image&rsquo;s tag can be specified as part of the image name.</p>
 </td>
 </tr>
 <tr>
@@ -11089,8 +11168,7 @@ string
 </em>
 </td>
 <td>
-<p><em>Deprecated: use &lsquo;spec.image&rsquo; instead. The image&rsquo;s digest can be
-specified as part of the image name.</em></p>
+<p>Deprecated: use &lsquo;spec.image&rsquo; instead. The image&rsquo;s digest can be specified as part of the image name.</p>
 </td>
 </tr>
 <tr>
@@ -11158,7 +11236,7 @@ Rules
 <p>Defines the list of PrometheusRule objects to which the namespace label
 enforcement doesn&rsquo;t apply.
 This is only relevant when <code>spec.enforcedNamespaceLabel</code> is set to true.
-<em>Deprecated: use <code>spec.excludedFromEnforcement</code> instead.</em></p>
+Deprecated: use <code>spec.excludedFromEnforcement</code> instead.</p>
 </td>
 </tr>
 <tr>
@@ -11329,7 +11407,7 @@ bool
 <td>
 <p>AllowOverlappingBlocks enables vertical compaction and vertical query
 merge in Prometheus.</p>
-<p><em>Deprecated: this flag has no effect for Prometheus &gt;= 2.39.0 where overlapping blocks are enabled by default.</em></p>
+<p>Deprecated: this flag has no effect for Prometheus &gt;= 2.39.0 where overlapping blocks are enabled by default.</p>
 </td>
 </tr>
 <tr>
@@ -12143,7 +12221,7 @@ string
 </td>
 <td>
 <p>File from which to read the bearer token for the URL.</p>
-<p><em>Deprecated: this will be removed in a future release. Prefer using <code>authorization</code>.</em></p>
+<p>Deprecated: this will be removed in a future release. Prefer using <code>authorization</code>.</p>
 </td>
 </tr>
 <tr>
@@ -12172,7 +12250,7 @@ string
 <td>
 <p><em>Warning: this field shouldn&rsquo;t be used because the token value appears
 in clear-text. Prefer using <code>authorization</code>.</em></p>
-<p><em>Deprecated: this will be removed in a future release.</em></p>
+<p>Deprecated: this will be removed in a future release.</p>
 </td>
 </tr>
 <tr>
@@ -12379,7 +12457,7 @@ string
 </td>
 <td>
 <p>File from which to read bearer token for the URL.</p>
-<p><em>Deprecated: this will be removed in a future release. Prefer using <code>authorization</code>.</em></p>
+<p>Deprecated: this will be removed in a future release. Prefer using <code>authorization</code>.</p>
 </td>
 </tr>
 <tr>
@@ -12440,7 +12518,7 @@ string
 <td>
 <p><em>Warning: this field shouldn&rsquo;t be used because the token value appears
 in clear-text. Prefer using <code>authorization</code>.</em></p>
-<p><em>Deprecated: this will be removed in a future release.</em></p>
+<p>Deprecated: this will be removed in a future release.</p>
 </td>
 </tr>
 <tr>
@@ -12494,6 +12572,18 @@ MetadataConfig
 <td>
 <em>(Optional)</em>
 <p>MetadataConfig configures the sending of series metadata to the remote storage.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>enableHttp2</code><br/>
+<em>
+bool
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Whether to enable HTTP2.</p>
 </td>
 </tr>
 </tbody>
@@ -12823,7 +12913,7 @@ Kubernetes core/v1.SecretKeySelector
 <h3 id="monitoring.coreos.com/v1.SafeTLSConfig">SafeTLSConfig
 </h3>
 <p>
-(<em>Appears on:</em><a href="#monitoring.coreos.com/v1.HTTPConfig">HTTPConfig</a>, <a href="#monitoring.coreos.com/v1.PodMetricsEndpointTLSConfig">PodMetricsEndpointTLSConfig</a>, <a href="#monitoring.coreos.com/v1.ProbeTLSConfig">ProbeTLSConfig</a>, <a href="#monitoring.coreos.com/v1.TLSConfig">TLSConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.ConsulSDConfig">ConsulSDConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.EmailConfig">EmailConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.HTTPConfig">HTTPConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.HTTPSDConfig">HTTPSDConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.ScrapeConfigSpec">ScrapeConfigSpec</a>, <a href="#monitoring.coreos.com/v1beta1.EmailConfig">EmailConfig</a>, <a href="#monitoring.coreos.com/v1beta1.HTTPConfig">HTTPConfig</a>)
+(<em>Appears on:</em><a href="#monitoring.coreos.com/v1.HTTPConfig">HTTPConfig</a>, <a href="#monitoring.coreos.com/v1.PodMetricsEndpointTLSConfig">PodMetricsEndpointTLSConfig</a>, <a href="#monitoring.coreos.com/v1.ProbeTLSConfig">ProbeTLSConfig</a>, <a href="#monitoring.coreos.com/v1.TLSConfig">TLSConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.ConsulSDConfig">ConsulSDConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.EmailConfig">EmailConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.HTTPConfig">HTTPConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.HTTPSDConfig">HTTPSDConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.OpenStackSDConfig">OpenStackSDConfig</a>, <a href="#monitoring.coreos.com/v1alpha1.ScrapeConfigSpec">ScrapeConfigSpec</a>, <a href="#monitoring.coreos.com/v1beta1.EmailConfig">EmailConfig</a>, <a href="#monitoring.coreos.com/v1beta1.HTTPConfig">HTTPConfig</a>)
 </p>
 <div>
 <p>SafeTLSConfig specifies safe TLS configuration parameters.</p>
@@ -13326,7 +13416,7 @@ bool
 </em>
 </td>
 <td>
-<p><em>Deprecated: subPath usage will be removed in a future release.</em></p>
+<p>Deprecated: subPath usage will be removed in a future release.</p>
 </td>
 </tr>
 <tr>
@@ -14375,8 +14465,7 @@ string
 </td>
 <td>
 <em>(Optional)</em>
-<p><em>Deprecated: use &lsquo;image&rsquo; instead. The image&rsquo;s tag can be specified as
-part of the image name.</em></p>
+<p>Deprecated: use &lsquo;image&rsquo; instead. The image&rsquo;s tag can be specified as as part of the image name.</p>
 </td>
 </tr>
 <tr>
@@ -14388,8 +14477,7 @@ string
 </td>
 <td>
 <em>(Optional)</em>
-<p><em>Deprecated: use &lsquo;image&rsquo; instead.  The image digest can be specified
-as part of the image name.</em></p>
+<p>Deprecated: use &lsquo;image&rsquo; instead.  The image digest can be specified as part of the image name.</p>
 </td>
 </tr>
 <tr>
@@ -14401,7 +14489,7 @@ string
 </td>
 <td>
 <em>(Optional)</em>
-<p><em>Deprecated: use &lsquo;image&rsquo; instead.</em></p>
+<p>Deprecated: use &lsquo;image&rsquo; instead.</p>
 </td>
 </tr>
 <tr>
@@ -14455,7 +14543,7 @@ bool
 </em>
 </td>
 <td>
-<p><em>Deprecated: use <code>grpcListenLocal</code> and <code>httpListenLocal</code> instead.</em></p>
+<p>Deprecated: use <code>grpcListenLocal</code> and <code>httpListenLocal</code> instead.</p>
 </td>
 </tr>
 <tr>
@@ -16609,6 +16697,19 @@ ReloadStrategyType
 If not specified, the configuration is reloaded using the /-/reload HTTP endpoint.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>maximumStartupDurationSeconds</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Defines the maximum time that the <code>prometheus</code> container&rsquo;s startup probe will wait before being considered failed. The startup probe will return success after the WAL replay is complete.
+If set, the value should be greater than 60 (seconds). Otherwise it will be equal to 600 seconds (15 minutes).</p>
+</td>
+</tr>
 </table>
 </td>
 </tr>
@@ -16811,6 +16912,20 @@ ScrapeConfigSpec
 <td>
 <em>(Optional)</em>
 <p>GCESDConfigs defines a list of GCE service discovery configurations.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>openstackSDConfigs</code><br/>
+<em>
+<a href="#monitoring.coreos.com/v1alpha1.OpenStackSDConfig">
+[]OpenStackSDConfig
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>OpenStackSDConfigs defines a list of OpenStack service discovery configurations.</p>
 </td>
 </tr>
 <tr>
@@ -18810,7 +18925,7 @@ bool
 <td>
 <em>(Optional)</em>
 <p>Whether to match on equality (false) or regular-expression (true).
-Deprecated as of AlertManager &gt;= v0.22.0 where a user should use MatchType instead.</p>
+Deprecated: for AlertManager &gt;= v0.22.0, <code>matchType</code> should be used instead.</p>
 </td>
 </tr>
 </tbody>
@@ -18900,6 +19015,262 @@ string
 </td>
 <td>
 <p>TimeIntervals is a list of TimeInterval</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="monitoring.coreos.com/v1alpha1.OpenStackSDConfig">OpenStackSDConfig
+</h3>
+<p>
+(<em>Appears on:</em><a href="#monitoring.coreos.com/v1alpha1.ScrapeConfigSpec">ScrapeConfigSpec</a>)
+</p>
+<div>
+<p>OpenStackSDConfig allow retrieving scrape targets from OpenStack Nova instances.
+See <a href="https://prometheus.io/docs/prometheus/latest/configuration/configuration/#openstack_sd_config">https://prometheus.io/docs/prometheus/latest/configuration/configuration/#openstack_sd_config</a></p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>role</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>The OpenStack role of entities that should be discovered.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>region</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>The OpenStack Region.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>identityEndpoint</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>IdentityEndpoint specifies the HTTP endpoint that is required to work with
+the Identity API of the appropriate version.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>username</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Username is required if using Identity V2 API. Consult with your provider&rsquo;s
+control panel to discover your account&rsquo;s username.
+In Identity V3, either userid or a combination of username
+and domainId or domainName are needed</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>userid</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>UserID</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>password</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.24/#secretkeyselector-v1-core">
+Kubernetes core/v1.SecretKeySelector
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Password for the Identity V2 and V3 APIs. Consult with your provider&rsquo;s
+control panel to discover your account&rsquo;s preferred method of authentication.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>domainName</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>At most one of domainId and domainName must be provided if using username
+with Identity V3. Otherwise, either are optional.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>domainID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>DomainID</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>projectName</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>The ProjectId and ProjectName fields are optional for the Identity V2 API.
+Some providers allow you to specify a ProjectName instead of the ProjectId.
+Some require both. Your provider&rsquo;s authentication policies will determine
+how these fields influence authentication.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>projectID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>ProjectID</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>applicationCredentialName</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>The ApplicationCredentialID or ApplicationCredentialName fields are
+required if using an application credential to authenticate. Some providers
+allow you to create an application credential to authenticate rather than a
+password.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>applicationCredentialId</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>ApplicationCredentialID</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>applicationCredentialSecret</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.24/#secretkeyselector-v1-core">
+Kubernetes core/v1.SecretKeySelector
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>The applicationCredentialSecret field is required if using an application
+credential to authenticate.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>allTenants</code><br/>
+<em>
+bool
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Whether the service discovery should list all instances for all projects.
+It is only relevant for the &lsquo;instance&rsquo; role and usually requires admin permissions.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>refreshInterval</code><br/>
+<em>
+<a href="#monitoring.coreos.com/v1.Duration">
+Duration
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Refresh interval to re-read the instance list.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>port</code><br/>
+<em>
+int
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>The port to scrape metrics from. If using the public IP address, this must
+instead be specified in the relabeling rule.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>availability</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Availability of the endpoint to connect to.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>tlsConfig</code><br/>
+<em>
+<a href="#monitoring.coreos.com/v1.SafeTLSConfig">
+SafeTLSConfig
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>TLS configuration applying to the target HTTP endpoint.</p>
 </td>
 </tr>
 </tbody>
@@ -20758,6 +21129,19 @@ ReloadStrategyType
 If not specified, the configuration is reloaded using the /-/reload HTTP endpoint.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>maximumStartupDurationSeconds</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Defines the maximum time that the <code>prometheus</code> container&rsquo;s startup probe will wait before being considered failed. The startup probe will return success after the WAL replay is complete.
+If set, the value should be greater than 60 (seconds). Otherwise it will be equal to 600 seconds (15 minutes).</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="monitoring.coreos.com/v1alpha1.ProxyConfig">ProxyConfig
@@ -21729,6 +22113,20 @@ HTTPConfig
 <td>
 <em>(Optional)</em>
 <p>GCESDConfigs defines a list of GCE service discovery configurations.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>openstackSDConfigs</code><br/>
+<em>
+<a href="#monitoring.coreos.com/v1alpha1.OpenStackSDConfig">
+[]OpenStackSDConfig
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>OpenStackSDConfigs defines a list of OpenStack service discovery configurations.</p>
 </td>
 </tr>
 <tr>

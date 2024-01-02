@@ -29,6 +29,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/utils/ptr"
 
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/prometheus-operator/prometheus-operator/pkg/k8sutil"
@@ -98,34 +99,30 @@ func makeStatefulSet(logger log.Logger, am *monitoringv1.Alertmanager, config Co
 		return nil, err
 	}
 
-	boolTrue := true
+	annotations := map[string]string{
+		sSetInputHashName: inputHash,
+	}
+
 	// do not transfer kubectl annotations to the statefulset so it is not
 	// pruned by kubectl
-	annotations := make(map[string]string)
 	for key, value := range am.ObjectMeta.Annotations {
-		if !strings.HasPrefix(key, "kubectl.kubernetes.io/") {
+		if key != sSetInputHashName && !strings.HasPrefix(key, "kubectl.kubernetes.io/") {
 			annotations[key] = value
 		}
 	}
-	annotations[sSetInputHashName] = inputHash
+
 	statefulset := &appsv1.StatefulSet{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:        prefixedName(am.Name),
-			Labels:      config.Labels.Merge(am.ObjectMeta.Labels),
-			Annotations: config.Annotations.Merge(annotations),
-			OwnerReferences: []metav1.OwnerReference{
-				{
-					APIVersion:         am.APIVersion,
-					BlockOwnerDeletion: &boolTrue,
-					Controller:         &boolTrue,
-					Kind:               am.Kind,
-					Name:               am.Name,
-					UID:                am.UID,
-				},
-			},
-		},
 		Spec: *spec,
 	}
+	operator.UpdateObject(
+		statefulset,
+		operator.WithName(prefixedName(am.Name)),
+		operator.WithAnnotations(annotations),
+		operator.WithAnnotations(config.Annotations),
+		operator.WithLabels(am.Labels),
+		operator.WithLabels(config.Labels),
+		operator.WithManagingOwner(am),
+	)
 
 	if am.Spec.ImagePullSecrets != nil && len(am.Spec.ImagePullSecrets) > 0 {
 		statefulset.Spec.Template.Spec.ImagePullSecrets = am.Spec.ImagePullSecrets
@@ -175,35 +172,19 @@ func makeStatefulSet(logger log.Logger, am *monitoringv1.Alertmanager, config Co
 	return statefulset, nil
 }
 
-func makeStatefulSetService(p *monitoringv1.Alertmanager, config Config) *v1.Service {
-
-	if p.Spec.PortName == "" {
-		p.Spec.PortName = defaultPortName
+func makeStatefulSetService(a *monitoringv1.Alertmanager, config Config) *v1.Service {
+	if a.Spec.PortName == "" {
+		a.Spec.PortName = defaultPortName
 	}
 
 	svc := &v1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:        governingServiceName,
-			Annotations: config.Annotations,
-			Labels: config.Labels.Merge(map[string]string{
-				"operated-alertmanager": "true",
-			}),
-			OwnerReferences: []metav1.OwnerReference{
-				{
-					Name:       p.GetName(),
-					Kind:       p.Kind,
-					APIVersion: p.APIVersion,
-					UID:        p.GetUID(),
-				},
-			},
-		},
 		Spec: v1.ServiceSpec{
 			ClusterIP: "None",
 			Ports: []v1.ServicePort{
 				{
-					Name:       p.Spec.PortName,
+					Name:       a.Spec.PortName,
 					Port:       9093,
-					TargetPort: intstr.FromString(p.Spec.PortName),
+					TargetPort: intstr.FromString(a.Spec.PortName),
 					Protocol:   v1.ProtocolTCP,
 				},
 				{
@@ -224,6 +205,16 @@ func makeStatefulSetService(p *monitoringv1.Alertmanager, config Config) *v1.Ser
 			},
 		},
 	}
+
+	operator.UpdateObject(
+		svc,
+		operator.WithName(governingServiceName),
+		operator.WithAnnotations(config.Annotations),
+		operator.WithLabels(map[string]string{"operated-alertmanager": "true"}),
+		operator.WithLabels(config.Labels),
+		operator.WithOwner(a),
+	)
+
 	return svc
 }
 
@@ -313,10 +304,12 @@ func makeStatefulSetSpec(logger log.Logger, a *monitoringv1.Alertmanager, config
 	// connects with cluster A.
 	// --cluster.label flag was introduced in alertmanager v0.26, this helps to block
 	// any traffic that is not meant for the cluster.
-	// The value is hardcoded and the value is guaranteed to be unique in a given cluster but
-	// if there's a use case, we can consider a new field in the CRD.
 	if version.GTE(semver.MustParse("0.26.0")) {
-		amArgs = append(amArgs, fmt.Sprintf("--cluster.label=%s/%s", a.Namespace, a.Name))
+		clusterLabel := fmt.Sprintf("%s/%s", a.Namespace, a.Name)
+		if a.Spec.ClusterLabel != nil {
+			clusterLabel = *a.Spec.ClusterLabel
+		}
+		amArgs = append(amArgs, fmt.Sprintf("--cluster.label=%s", clusterLabel))
 	}
 
 	isHTTPS := a.Spec.Web != nil && a.Spec.Web.TLSConfig != nil && version.GTE(semver.MustParse("0.22.0"))
@@ -681,12 +674,9 @@ func makeStatefulSetSpec(logger log.Logger, a *monitoringv1.Alertmanager, config
 		amVolumeMounts = append(amVolumeMounts, configMount...)
 	}
 
-	terminationGracePeriod := int64(120)
 	finalSelectorLabels := config.Labels.Merge(podSelectorLabels)
 	finalLabels := config.Labels.Merge(podLabels)
 
-	boolFalse := false
-	boolTrue := true
 	alertmanagerURIScheme := "http"
 	if isHTTPS {
 		alertmanagerURIScheme = "https"
@@ -704,8 +694,8 @@ func makeStatefulSetSpec(logger log.Logger, a *monitoringv1.Alertmanager, config
 			ReadinessProbe:  readinessProbe,
 			Resources:       a.Spec.Resources,
 			SecurityContext: &v1.SecurityContext{
-				AllowPrivilegeEscalation: &boolFalse,
-				ReadOnlyRootFilesystem:   &boolTrue,
+				AllowPrivilegeEscalation: ptr.To(false),
+				ReadOnlyRootFilesystem:   ptr.To(true),
 				Capabilities: &v1.Capabilities{
 					Drop: []v1.Capability{"ALL"},
 				},
@@ -797,7 +787,7 @@ func makeStatefulSetSpec(logger log.Logger, a *monitoringv1.Alertmanager, config
 				AutomountServiceAccountToken:  a.Spec.AutomountServiceAccountToken,
 				NodeSelector:                  a.Spec.NodeSelector,
 				PriorityClassName:             a.Spec.PriorityClassName,
-				TerminationGracePeriodSeconds: &terminationGracePeriod,
+				TerminationGracePeriodSeconds: ptr.To(int64(120)),
 				InitContainers:                initContainers,
 				Containers:                    containers,
 				Volumes:                       volumes,

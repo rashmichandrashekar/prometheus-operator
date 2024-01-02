@@ -48,7 +48,6 @@ func makeStatefulSet(
 ) (*appsv1.StatefulSet, error) {
 	cpf := p.GetCommonPrometheusFields()
 	objMeta := p.GetObjectMeta()
-	typeMeta := p.GetTypeMeta()
 
 	if cpf.PortName == "" {
 		cpf.PortName = prompkg.DefaultPortName
@@ -64,49 +63,33 @@ func makeStatefulSet(
 		return nil, fmt.Errorf("make StatefulSet spec: %w", err)
 	}
 
-	boolTrue := true
+	annotations := map[string]string{
+		prompkg.SSetInputHashName: inputHash,
+	}
+
 	// do not transfer kubectl annotations to the statefulset so it is not
 	// pruned by kubectl
-	annotations := make(map[string]string)
 	for key, value := range objMeta.GetAnnotations() {
-		if !strings.HasPrefix(key, "kubectl.kubernetes.io/") {
+		if key != prompkg.SSetInputHashName && !strings.HasPrefix(key, "kubectl.kubernetes.io/") {
 			annotations[key] = value
 		}
 	}
-	labels := make(map[string]string)
-	for key, value := range objMeta.GetLabels() {
-		labels[key] = value
-	}
-	labels[prompkg.ShardLabelName] = fmt.Sprintf("%d", shard)
-	labels[prompkg.PrometheusNameLabelName] = objMeta.GetName()
-	labels[prompkg.PrometheusModeLabeLName] = prometheusMode
+	statefulset := &appsv1.StatefulSet{Spec: *spec}
 
-	statefulset := &appsv1.StatefulSet{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:        name,
-			Labels:      config.Labels.Merge(labels),
-			Annotations: config.Annotations.Merge(annotations),
-			OwnerReferences: []metav1.OwnerReference{
-				{
-					APIVersion:         typeMeta.APIVersion,
-					BlockOwnerDeletion: &boolTrue,
-					Controller:         &boolTrue,
-					Kind:               typeMeta.Kind,
-					Name:               objMeta.GetName(),
-					UID:                objMeta.GetUID(),
-				},
-			},
-		},
-		Spec: *spec,
-	}
-
-	if statefulset.ObjectMeta.Annotations == nil {
-		statefulset.ObjectMeta.Annotations = map[string]string{
-			prompkg.SSetInputHashName: inputHash,
-		}
-	} else {
-		statefulset.ObjectMeta.Annotations[prompkg.SSetInputHashName] = inputHash
-	}
+	operator.UpdateObject(
+		statefulset,
+		operator.WithName(name),
+		operator.WithAnnotations(annotations),
+		operator.WithAnnotations(config.Annotations),
+		operator.WithLabels(objMeta.GetLabels()),
+		operator.WithLabels(map[string]string{
+			prompkg.ShardLabelName:          fmt.Sprintf("%d", shard),
+			prompkg.PrometheusNameLabelName: objMeta.GetName(),
+			prompkg.PrometheusModeLabeLName: prometheusMode,
+		}),
+		operator.WithLabels(config.Labels),
+		operator.WithManagingOwner(p),
+	)
 
 	if cpf.ImagePullSecrets != nil && len(cpf.ImagePullSecrets) > 0 {
 		statefulset.Spec.Template.Spec.ImagePullSecrets = cpf.ImagePullSecrets
@@ -170,9 +153,6 @@ func makeStatefulSetSpec(
 	shard int32,
 	tlsAssetSecrets []string,
 ) (*appsv1.StatefulSetSpec, error) {
-	// Prometheus may take quite long to shut down to checkpoint existing data.
-	// Allow up to 10 minutes for clean termination.
-	terminationGracePeriod := int64(600)
 	cpf := p.GetCommonPrometheusFields()
 	promName := p.GetObjectMeta().GetName()
 
@@ -242,11 +222,12 @@ func makeStatefulSetSpec(
 	// We don't want to use the /-/healthy handler here because it returns OK as
 	// soon as the web server is started (irrespective of the WAL replay).
 	readyProbeHandler := prompkg.ProbeHandler("/-/ready", cpf, webConfigGenerator)
+	startupPeriodSeconds, startupFailureThreshold := prompkg.GetStatupProbePeriodSecondsAndFailureThreshold(cpf)
 	startupProbe := &v1.Probe{
 		ProbeHandler:     readyProbeHandler,
 		TimeoutSeconds:   prompkg.ProbeTimeoutSeconds,
-		PeriodSeconds:    15,
-		FailureThreshold: 60,
+		PeriodSeconds:    startupPeriodSeconds,
+		FailureThreshold: startupFailureThreshold,
 	}
 
 	readinessProbe := &v1.Probe{
@@ -379,15 +360,17 @@ func makeStatefulSetSpec(
 				Annotations: podAnnotations,
 			},
 			Spec: v1.PodSpec{
-				ShareProcessNamespace:         prompkg.ShareProcessNamespace(p),
-				Containers:                    containers,
-				InitContainers:                initContainers,
-				SecurityContext:               cpf.SecurityContext,
-				ServiceAccountName:            cpf.ServiceAccountName,
-				AutomountServiceAccountToken:  ptr.To(true),
-				NodeSelector:                  cpf.NodeSelector,
-				PriorityClassName:             cpf.PriorityClassName,
-				TerminationGracePeriodSeconds: &terminationGracePeriod,
+				ShareProcessNamespace:        prompkg.ShareProcessNamespace(p),
+				Containers:                   containers,
+				InitContainers:               initContainers,
+				SecurityContext:              cpf.SecurityContext,
+				ServiceAccountName:           cpf.ServiceAccountName,
+				AutomountServiceAccountToken: ptr.To(true),
+				NodeSelector:                 cpf.NodeSelector,
+				PriorityClassName:            cpf.PriorityClassName,
+				// Prometheus may take quite long to shut down to checkpoint existing data.
+				// Allow up to 10 minutes for clean termination.
+				TerminationGracePeriodSeconds: ptr.To(int64(600)),
 				Volumes:                       volumes,
 				Tolerations:                   cpf.Tolerations,
 				Affinity:                      cpf.Affinity,
@@ -407,21 +390,6 @@ func makeStatefulSetService(p *monitoringv1alpha1.PrometheusAgent, config prompk
 	}
 
 	svc := &v1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: governingServiceName,
-			OwnerReferences: []metav1.OwnerReference{
-				{
-					Name:       p.GetName(),
-					Kind:       p.Kind,
-					APIVersion: p.APIVersion,
-					UID:        p.GetUID(),
-				},
-			},
-			Annotations: config.Annotations,
-			Labels: config.Labels.Merge(map[string]string{
-				"operated-prometheus": "true",
-			}),
-		},
 		Spec: v1.ServiceSpec{
 			ClusterIP: "None",
 			Ports: []v1.ServicePort{
@@ -436,6 +404,15 @@ func makeStatefulSetService(p *monitoringv1alpha1.PrometheusAgent, config prompk
 			},
 		},
 	}
+
+	operator.UpdateObject(
+		svc,
+		operator.WithName(governingServiceName),
+		operator.WithAnnotations(config.Annotations),
+		operator.WithLabels(map[string]string{"operated-prometheus": "true"}),
+		operator.WithLabels(config.Labels),
+		operator.WithOwner(p),
+	)
 
 	return svc
 }
