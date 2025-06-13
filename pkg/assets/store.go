@@ -399,6 +399,8 @@ func (s *StoreBuilder) UpdateObject(obj interface{}) error {
 
 	if err := s.objStore.Update(obj); err != nil {
 		return fmt.Errorf("failed to update object in store: %w", err)
+	} else {
+		fmt.Println("Object updated successfully in store")
 	}
 
 	return nil
@@ -414,6 +416,8 @@ func (s *StoreBuilder) DeleteObject(obj interface{}) error {
 
 	if err := s.objStore.Delete(obj); err != nil {
 		return fmt.Errorf("failed to delete object in store: %w", err)
+	} else {
+		fmt.Println("Object deleted successfully from store")
 	}
 
 	return nil
