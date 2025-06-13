@@ -392,6 +392,7 @@ func (cos *cacheOnlyStore) TLSAsset(sel interface{}) string {
 // UpdateObject updates the object in the underlying store.More actions
 // This method is only used by external clients of the assets package such as the OpenTelemetry collector operator.
 func (s *StoreBuilder) UpdateObject(obj interface{}) error {
+	fmt.Println("UpdateObject called with object:", obj)
 	if obj == nil {
 		return errors.New("object cannot be nil")
 	}
@@ -406,6 +407,7 @@ func (s *StoreBuilder) UpdateObject(obj interface{}) error {
 // DeleteObject updates the object in the underlying store.
 // This method is only used by external clients of the assets package such as the OpenTelemetry collector operator.
 func (s *StoreBuilder) DeleteObject(obj interface{}) error {
+	fmt.Println("DeleteObject called with object:", obj)
 	if obj == nil {
 		return errors.New("object cannot be nil")
 	}
