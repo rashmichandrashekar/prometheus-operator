@@ -389,17 +389,20 @@ func (cos *cacheOnlyStore) TLSAsset(sel interface{}) string {
 	return k.toString()
 }
 
-func (s *StoreBuilder) HasObject(obj interface{}) (bool, error) {
-	if obj == nil {
-		return false, errors.New("object cannot be nil")
+func (s *StoreBuilder) HasObject(objectKey string) (bool, error) {
+	if objectKey == nil {
+		return false, errors.New("object key cannot be nil")
 	}
 
-	key, err := assetKeyFunc(obj)
-	if err != nil {
-		return false, fmt.Errorf("failed to get key for object: %w", err)
+	if objectKey == "" {
+		return false, errors.New("object key cannot be empty")
 	}
 
-	_, exists, err := s.objStore.GetByKey(key)
+	if s.objStore == nil {
+		return false, nil
+	}
+
+	_, exists, err := s.objStore.GetByKey(objectKey)
 	if err != nil {
 		return false, fmt.Errorf("failed to check object in store: %w", err)
 	}
@@ -422,29 +425,29 @@ func (s *StoreBuilder) AddObject(obj interface{}) error {
 	return nil
 }
 
-// GetObject retrieves an object from the underlying store.
-// This method is only used by external clients of the assets package such as the OpenTelemetry collector operator.
-func (s *StoreBuilder) GetObject(obj interface{}) (interface{}, error) {
-	if obj == nil {
-		return nil, errors.New("object cannot be nil")
-	}
+// // GetObject retrieves an object from the underlying store.
+// // This method is only used by external clients of the assets package such as the OpenTelemetry collector operator.
+// func (s *StoreBuilder) GetObject(objKey string) (interface{}, error) {
+// 	if obj == nil {
+// 		return nil, errors.New("object cannot be nil")
+// 	}
 
-	key, err := assetKeyFunc(obj)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get key for object: %w", err)
-	}
+// 	key, err := assetKeyFunc(obj)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("failed to get key for object: %w", err)
+// 	}
 
-	item, exists, err := s.objStore.GetByKey(key)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get object from store: %w", err)
-	}
+// 	item, exists, err := s.objStore.GetByKey(key)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("failed to get object from store: %w", err)
+// 	}
 
-	if !exists {
-		return nil, fmt.Errorf("object with key %s not found in store", key)
-	}
+// 	if !exists {
+// 		return nil, fmt.Errorf("object with key %s not found in store", key)
+// 	}
 
-	return item, nil
-}
+// 	return item, nil
+// }
 
 // UpdateObject updates the object in the underlying store.More actions
 // This method is only used by external clients of the assets package such as the OpenTelemetry collector operator.
