@@ -449,3 +449,7 @@ func (s *StoreBuilder) DeleteObject(obj interface{}) error {
 
 	return nil
 }
+
+func (s *StoreBuilder) SecretClient() corev1client.SecretsGetter {
+	return s.sClient
+}
