@@ -407,16 +407,16 @@ func (s *StoreBuilder) AddObject(obj interface{}) error {
 // This method is only used by external clients of the assets package such as the OpenTelemetry collector operator.
 func (s *StoreBuilder) GetObject(obj interface{}) (interface{}, bool, error) {
 	if obj == nil {
-		return nil, errors.New("object cannot be nil")
+		return nil, false, errors.New("object cannot be nil")
 	}
 
 	item, exists, err := s.objStore.Get(obj)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get object from store: %w", err)
+		return nil, false, fmt.Errorf("failed to get object from store: %w", err)
 	}
 
 	if !exists {
-		return nil, fmt.Errorf("object with key %s not found in store", key)
+		return nil, exists, nil
 	}
 
 	return item, exists, nil
