@@ -389,30 +389,8 @@ func (cos *cacheOnlyStore) TLSAsset(sel interface{}) string {
 	return k.toString()
 }
 
-func (s *StoreBuilder) HasObject(objectKey string) (bool, error) {
-	if objectKey == nil {
-		return false, errors.New("object key cannot be nil")
-	}
-
-	if objectKey == "" {
-		return false, errors.New("object key cannot be empty")
-	}
-
-	if s.objStore == nil {
-		return false, nil
-	}
-
-	_, exists, err := s.objStore.GetByKey(objectKey)
-	if err != nil {
-		return false, fmt.Errorf("failed to check object in store: %w", err)
-	}
-
-	return exists, nil
-}
-
 // AddObject adds an object to the underlying store.
-// This method is only used by external clients of the assets package such as the OpenTelemetry collector operator.
-
+// This method is only used by external clients of the assets package such as the OpenTelemetry collector operato
 func (s *StoreBuilder) AddObject(obj interface{}) error {
 	if obj == nil {
 		return errors.New("object cannot be nil")
@@ -425,42 +403,34 @@ func (s *StoreBuilder) AddObject(obj interface{}) error {
 	return nil
 }
 
-// // GetObject retrieves an object from the underlying store.
-// // This method is only used by external clients of the assets package such as the OpenTelemetry collector operator.
-// func (s *StoreBuilder) GetObject(objKey string) (interface{}, error) {
-// 	if obj == nil {
-// 		return nil, errors.New("object cannot be nil")
-// 	}
+// GetObject retrieves an object from the underlying store.
+// This method is only used by external clients of the assets package such as the OpenTelemetry collector operator.
+func (s *StoreBuilder) GetObject(obj interface{}) (interface{}, bool, error) {
+	if obj == nil {
+		return nil, errors.New("object cannot be nil")
+	}
 
-// 	key, err := assetKeyFunc(obj)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to get key for object: %w", err)
-// 	}
+	item, exists, err := s.objStore.Get(obj)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get object from store: %w", err)
+	}
 
-// 	item, exists, err := s.objStore.GetByKey(key)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to get object from store: %w", err)
-// 	}
+	if !exists {
+		return nil, fmt.Errorf("object with key %s not found in store", key)
+	}
 
-// 	if !exists {
-// 		return nil, fmt.Errorf("object with key %s not found in store", key)
-// 	}
+	return item, exists, nil
+}
 
-// 	return item, nil
-// }
-
-// UpdateObject updates the object in the underlying store.More actions
+// UpdateObject updates the object in the underlying store.
 // This method is only used by external clients of the assets package such as the OpenTelemetry collector operator.
 func (s *StoreBuilder) UpdateObject(obj interface{}) error {
-	fmt.Println("UpdateObject called with object:", obj)
 	if obj == nil {
 		return errors.New("object cannot be nil")
 	}
 
 	if err := s.objStore.Update(obj); err != nil {
 		return fmt.Errorf("failed to update object in store: %w", err)
-	} else {
-		fmt.Println("Object updated successfully in store")
 	}
 
 	return nil
@@ -469,15 +439,12 @@ func (s *StoreBuilder) UpdateObject(obj interface{}) error {
 // DeleteObject updates the object in the underlying store.
 // This method is only used by external clients of the assets package such as the OpenTelemetry collector operator.
 func (s *StoreBuilder) DeleteObject(obj interface{}) error {
-	fmt.Println("DeleteObject called with object:", obj)
 	if obj == nil {
 		return errors.New("object cannot be nil")
 	}
 
 	if err := s.objStore.Delete(obj); err != nil {
 		return fmt.Errorf("failed to delete object in store: %w", err)
-	} else {
-		fmt.Println("Object deleted successfully from store")
 	}
 
 	return nil
